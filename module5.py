@@ -1,12 +1,9 @@
 class Buiding:
+    total = 0
+    def __init__(self):
+        Buiding.total +=1
 
-    total = 40
+for i in range(1, 41):
+    Buiding()
 
-    def __init__(self, total):
-        self.total = total
-
-    for total in range(1, 41):
-        print(total)
-
-
-Building  = Buiding(1)
+print(Buiding.total)
