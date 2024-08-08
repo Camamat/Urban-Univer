@@ -1,61 +1,65 @@
 import threading
-import time
-
-import queue
+from queue import Queue
+from time import sleep
+from random import randint
 
 
 class Table:
     def __init__(self, number):
         self.number = number
-        self.is_busy = False
+        self.guest = None
 
-class Cafe:
-    def __init__(self, tables):
-        self.queue = queue.Queue()
-        self.tables = tables
 
-    def customer_arrival(self):
-        customer_number = 1
-        while customer_number <= 20:
-            print(f"Посетитель номер {customer_number} прибыл.")
-            customer_thread = Customer(customer_number, self)
-            customer_thread.start()
-            customer_number += 1
-            time.sleep(1)
-
-    def serve_customer(self, customer):
-        table_found = False
-        for table in self.tables:
-            if not table.is_busy:
-                table.is_busy = True
-                print(f"Посетитель номер {customer.number} сел за стол {table.number}.")
-                time.sleep(5)
-                table.is_busy = False
-                print(f"Посетитель номер {customer.number} покушал и ушёл.")
-                table_found = True
-                break
-        if not table_found:
-            print(f"Посетитель номер {customer.number} ожидает свободный стол.")
-            self.queue.put(customer)
-            self.queue.get()
-
-class Customer(threading.Thread):
-    def __init__(self, number, cafe):
+class Guest(threading.Thread):
+    def __init__(self, name):
         super().__init__()
-        self.number = number
-        self.cafe = cafe
+        self.name = name
 
     def run(self):
-        self.cafe.serve_customer(self)
+        sleep(randint(3, 10))
 
-table1 = Table(1)
-table2 = Table(2)
-table3 = Table(3)
-tables = [table1, table2, table3]
+class Cafe():
+    def __init__(self, *tables):
+        self.queue = Queue()
+        self.tables = tables
+        
+    def guest_arrival(self, *guests):
+        for guest in guests:
+            for table in self.tables:
+                if table.guest is None:
+                    guest.start()
+                    print(f'{guest.name} сел(-а) за стол номер {table.number}')
+                    table.guest = guest
+                    break
+            else:
+                print(f'{guest.name} в очереди')
+                self.queue.put(guest)
 
-cafe = Cafe(tables)
+    def discuss_guests(self):
+        while self.queue.empty() == False or any([table.guest for table in self.tables]):
+            for table in self.tables:
+                if table.guest is not None and not table.guest.is_alive():
+                    print(f'{table.guest.name} покушал(-а) и ушёл(ушла)')
+                    print(f'Стол номер {table.number} свободен')
+                    table.guest = None
+                if not self.queue.empty() and table.guest is None:
+                    table.guest = self.queue.get()
+                    print(f'{table.guest.name} вышел(-ла) из очереди и сел(-а) за стол номер {table.number}')
+                    table.guest.start()
 
-customer_arrival_thread = threading.Thread(target=cafe.customer_arrival)
-customer_arrival_thread.start()
+# Создание столов
+tables = [Table(number) for number in range(1, 6)]
 
-customer_arrival_thread.join()
+# Имена гостей
+guests_names = [
+    'Maria', 'Oleg', 'Vakhtang', 'Sergey', 'Darya', 'Arman',
+    'Vitoria', 'Nikita', 'Galina', 'Pavel', 'Ilya', 'Alexandra'
+]
+# Создание гостей
+guests = [Guest(name) for name in guests_names]
+# Заполнение кафе столами
+cafe = Cafe(*tables)
+# Приём гостей
+cafe.guest_arrival(*guests)
+# Обслуживание гостей
+cafe.discuss_guests()
