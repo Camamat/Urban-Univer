@@ -1,0 +1,14 @@
+2024-08-27 19:28:39,499 | WARNING | Неверный тип данных для объекта Runner
+Traceback (most recent call last):
+  File "C:\Users\azatt\PycharmProjects\pythonProject\.venv\Homeworks\RunnerTest.py", line 25, in test_run
+    b = tests_12_4.Runner(video)
+                          ^^^^^
+NameError: name 'video' is not defined
+2024-08-27 19:28:39,502 | WARNING | Неверная скорость для Runner
+Traceback (most recent call last):
+  File "C:\Users\azatt\PycharmProjects\pythonProject\.venv\Homeworks\RunnerTest.py", line 14, in test_walk
+    a = tests_12_4.Runner('Azat', -6)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azatt\PycharmProjects\pythonProject\.venv\Homeworks\tests_12_4.py", line 14, in __init__
+    raise ValueError(f'Скорость не может быть отрицательной, сейчас {speed}')
+ValueError: Скорость не может быть отрицательной, сейчас -6
