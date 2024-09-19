@@ -4,10 +4,14 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import asyncio
+from crud_functions import *
+
+
 
 api = ''
 bot = Bot(token= api)
 dp = Dispatcher(bot, storage= MemoryStorage())
+
 
 kb = ReplyKeyboardMarkup(resize_keyboard= True)
 button = KeyboardButton( text= 'Рассчитать')
@@ -32,9 +36,12 @@ async def main_menu(message):
 
 @dp.message_handler(text = 'Купить')
 async def get_buying_list(message):
-    for i in range(1,5):
+    products = get_all_products()
+    i = 0
+    for product in products:
+        i = i + 1
         with open(f'{i}.png', 'rb') as img:
-            await message.answer_photo(img, f'Название: Product{i} | Описание: описание{i} | Цена: {i * 100}')
+            await message.answer_photo(img, f'Название:{product[1]} | Описание: {product[2]} | Цена: {product[3]}')
     await message.answer('Выберите продукт для покупки:', reply_markup= keyboard)
 
 @dp.callback_query_handler(text= 'product_buying')
